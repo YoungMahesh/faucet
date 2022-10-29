@@ -1,8 +1,15 @@
 import { useAtom } from "jotai"
-import { network1, Network } from "../state/home"
+import { network1, wallet } from "../state/home"
+import { Network } from "../types/main"
 
 export default function NetworkSwitcher() {
   const [currNet, setCurrNet] = useAtom(network1)
+  const [_, setWallet] = useAtom(wallet)
+
+  const switchNetwork = (network: Network) => {
+    setCurrNet(network)
+    setWallet("")
+  }
 
   return (
     <div className="m-8 flex justify-center">
@@ -15,7 +22,7 @@ export default function NetworkSwitcher() {
             name="accountType"
             value={Network.FantomTestnet}
             checked={currNet === Network.FantomTestnet}
-            onChange={() => setCurrNet(Network.FantomTestnet)}
+            onChange={() => switchNetwork(Network.FantomTestnet)}
           />
           <span className="ml-2">EVM</span>
         </label>
@@ -26,7 +33,7 @@ export default function NetworkSwitcher() {
             name="accountType"
             value={Network.SolanaDevnet}
             checked={currNet === Network.SolanaDevnet}
-            onChange={() => setCurrNet(Network.SolanaDevnet)}
+            onChange={() => switchNetwork(Network.SolanaDevnet)}
           />
           <span className="ml-2">Solana</span>
         </label>

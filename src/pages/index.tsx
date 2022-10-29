@@ -1,14 +1,14 @@
+import { useAtom } from "jotai"
 import type { NextPage } from "next"
 import Head from "next/head"
 import NetworkSwitcher from "../components/NetworkSwitcher"
 import TokensList from "../components/TokensList"
-import { useAtom } from "jotai"
-import { network1, Network } from "../state/home"
 import WalletInput from "../components/WallletInput"
+import { network1 } from "../state/home"
+import { Network } from "../types/main"
 
 const Home: NextPage = () => {
-  const [currNet] = useAtom(network1)
-
+  const [network] = useAtom(network1)
   return (
     <main>
       <Head>
@@ -20,7 +20,11 @@ const Home: NextPage = () => {
       <WalletInput />
       <NetworkSwitcher />
 
-      <TokensList />
+      {network === Network.SolanaDevnet ? (
+        <TokensList network={Network.SolanaDevnet} />
+      ) : (
+        <TokensList network={Network.FantomTestnet} />
+      )}
     </main>
   )
 }
