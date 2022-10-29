@@ -7,12 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model token {
-  id            Int    @id @default(autoincrement())
-  name          String
-  symbol        String
-  mint          String @unique
-  token_account String @unique
-  amount        Int
-  decimals      Int
+model solana_dev_tokens {
+  id              Int    @id @default(autoincrement())
+  mint            String @unique
+  token_account   String @unique
+  transfer_amount Int    @default(1)
+  decimals        Int    @default(18)
+  name            String
+  symbol          String
+}
+
+model fantom_test_tokens {
+  id              Int    @id @default(autoincrement())
+  name            String
+  symbol          String
+  address         String @unique
+  transfer_amount Int    @default(1)
+  decimals        Int    @default(18)
 }

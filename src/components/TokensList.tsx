@@ -9,7 +9,7 @@ import { Network, network1, wallet } from "../state/home"
 
 const connection = new Connection(clusterApiUrl("devnet"), "confirmed")
 const payer = Keypair.fromSecretKey(
-  new Uint8Array(JSON.parse(process.env.NEXT_PUBLIC_SECRET_KEY!))
+  new Uint8Array(JSON.parse(process.env.NEXT_PUBLIC_SOL_SECRET_KEY!))
 )
 
 const NoteBox = ({ note }: { note: string }) => (
@@ -94,12 +94,17 @@ export default function TokensList() {
             <Button1
               disabled={isTransfering}
               onClick={() =>
-                claimTokens(t.mint, t.token_account, t.amount, t.decimals)
+                claimTokens(
+                  t.mint,
+                  t.token_account,
+                  t.transfer_amount,
+                  t.decimals
+                )
               }
             >
               {isTransfering
                 ? "Transferring..."
-                : `Get ${t.amount} ${t.symbol}`}
+                : `Get ${t.transfer_amount} ${t.symbol}`}
             </Button1>
           </div>
         ))}

@@ -11,11 +11,12 @@ export default async function handler(
       const { page }: { page: string } = req.query as any
       console.log("page", page)
       const skip = parseInt(page) * 10
-      const tokens0 = await prisma.token.findMany({
+      const tokens0 = await prisma.solana_dev_tokens.findMany({
         skip,
         take: 10,
       })
       const tokens = tokens0.map((t) => t)
+      console.log("tokens1", tokens)
       res.status(200).json(tokens)
     } catch (err) {
       console.log(err)
