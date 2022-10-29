@@ -21,7 +21,6 @@ const fetchSolanaDevTokens = async (page: number, network: Network) => {
 
     const tokens: Token1[] = tokens0.map((t: any) => ({
       ...t,
-      address: network === Network.SolanaDevnet ? t.mint : t.address,
       token_account: network === Network.SolanaDevnet ? t.token_account : "",
     }))
     return tokens
