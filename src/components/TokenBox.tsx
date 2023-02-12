@@ -1,17 +1,17 @@
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { network1, wallet } from "../state/home"
-import { MoonCoinAddr, Token1, transferSplTokens1 } from "../web3/tokens"
+import { MoonCoinAddr, TokenInfo } from "../web3/tokens"
 import Button1 from "./Button1"
 import { Network } from "../types/main"
-import { ConnectWallet, useAddress, useSigner } from "@thirdweb-dev/react"
+import { ConnectWallet, useSigner } from "@thirdweb-dev/react"
 import { faucetContract } from "../web3/contracts"
 
 export default function TokenBox({
   t,
   setTxnUrl,
 }: {
-  t: Token1
+  t: TokenInfo
   setTxnUrl: (_: string) => void
 }) {
   const signer = useSigner()
@@ -21,8 +21,8 @@ export default function TokenBox({
   const [network] = useAtom(network1)
 
   const transferEVMTokens = async () => {
+    setIsTransfering(true)
     try {
-      setIsTransfering(true)
       if (!signer) return alert("Wallet not Connected")
       const faucetContr = faucetContract(signer)
       const txn = await faucetContr.transfer(MoonCoinAddr)
@@ -41,15 +41,12 @@ export default function TokenBox({
 
     setIsTransfering(true)
 
-    const txn = await transferSplTokens1(
-      recWallet,
-      t.address,
-      t.token_account,
-      t.transfer_amount,
-      t.decimals
+    const resp = await fetch(
+      `api/spl-transfer?recWallet=${recWallet}&mint=${t.address}&tokenAcc=${t.token_account}&amount=${t.transfer_amount}&decimals=${t.decimals}`
     )
-    if (txn.length) {
-      setTxnUrl(txn)
+    if (resp.status === 201) {
+      const txnUrl = await resp.text()
+      setTxnUrl(txnUrl)
       alert("Transferred Successfully")
     } else {
       alert("Could not able to transfer")
@@ -78,9 +75,11 @@ export default function TokenBox({
         </a>
       </p>
 
-      <div className="flex flex-wrap items-center justify-around mt-4">
+      <div className="flex flex-wrap items-center justify-between mt-4">
         <div>
-          {Network.FantomTestnet ? <ConnectWallet colorMode="dark" /> : null}
+          {network === Network.FantomTestnet ? (
+            <ConnectWallet colorMode="dark" />
+          ) : null}
         </div>
 
         <Button1
@@ -92,9 +91,7 @@ export default function TokenBox({
         >
           {isTransfering
             ? "Transferring..."
-            : network === Network.SolanaDevnet
-            ? `Get ${t.transfer_amount} ${t.symbol}`
-            : "Get 700 MN"}
+            : `Get ${t.transfer_amount} ${t.symbol}`}
         </Button1>
       </div>
     </div>

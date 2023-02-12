@@ -6,8 +6,8 @@ export default function WalletInput() {
 
   return (
     <div className="w-full">
-      <div className="flex justify-center items-center m-4 mt-8">
-        Your Wallet: &nbsp; &nbsp;
+      <div className="flex flex-wrap justify-center items-center m-4 mt-8">
+        <span>Your Wallet Address (only for Solana): &nbsp; &nbsp;</span>
         <input
           className="text-black w-[28rem] p-2"
           type="text"
