@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query"
 import { Network } from "../types/main"
 import { PublicKey, Keypair, Connection, clusterApiUrl } from "@solana/web3.js"
 import { getOrCreateAssociatedTokenAccount, transfer } from "@solana/spl-token"
-import { Contract, Wallet, providers } from "ethers"
 import { BNF } from "./utils"
 
 export interface Token1 {
@@ -77,37 +76,6 @@ export const transferSplTokens1 = async (
   }
 }
 
-//----------------------Fantom Testnet----------------------------
+// ---------------------Fantom Testnet-------------------------------
 
-export const transferERC20Tokens1 = async (
-  recWallet: string,
-  tokenAddress: string,
-  amount: number,
-  decimals: number
-) => {
-  try {
-    const erc20Abi = [
-      "function transfer(address to, uint256 amount) external returns (bool)",
-    ]
-    const getSigner = () => {
-      const privateKey = process.env.NEXT_PUBLIC_EVM_SECRET_KEY
-      const provider = new providers.JsonRpcProvider(
-        "https://rpc.testnet.fantom.network"
-      )
-      return new Wallet(privateKey!, provider)
-    }
-    const erc20Contract = (tokenAddress: string) =>
-      new Contract(tokenAddress, erc20Abi, getSigner())
-    const txn = await erc20Contract(tokenAddress).transfer(
-      recWallet,
-      BNF(amount)
-        .mul(BNF(10).pow(BNF(decimals)))
-        .toString()
-    )
-    await txn.wait(1)
-    return `https://testnet.ftmscan.com/tx/${txn.hash}`
-  } catch (err) {
-    console.log(err)
-    return ""
-  }
-}
+export const MoonCoinAddr = "0x18a8aACDe4B9ab03Abf9B7932b4099BDafb23e4E"

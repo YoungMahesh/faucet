@@ -1,13 +1,11 @@
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { network1, wallet } from "../state/home"
-import {
-  Token1,
-  transferERC20Tokens1,
-  transferSplTokens1,
-} from "../web3/tokens"
+import { MoonCoinAddr, Token1, transferSplTokens1 } from "../web3/tokens"
 import Button1 from "./Button1"
 import { Network } from "../types/main"
+import { ConnectWallet, useAddress, useSigner } from "@thirdweb-dev/react"
+import { faucetContract } from "../web3/contracts"
 
 export default function TokenBox({
   t,
@@ -16,25 +14,24 @@ export default function TokenBox({
   t: Token1
   setTxnUrl: (_: string) => void
 }) {
+  const signer = useSigner()
+
   const [recWallet] = useAtom(wallet)
   const [isTransfering, setIsTransfering] = useState(false)
   const [network] = useAtom(network1)
 
   const transferEVMTokens = async () => {
-    if (recWallet.length < 42) return alert("Invalid Wallet Address")
-
-    setIsTransfering(true)
-    const txn = await transferERC20Tokens1(
-      recWallet,
-      t.address,
-      t.transfer_amount,
-      t.decimals
-    )
-    if (txn.length) {
-      setTxnUrl(txn)
-      alert("Tranfer Successful")
-    } else {
-      alert("Tranfer Failed")
+    try {
+      setIsTransfering(true)
+      if (!signer) return alert("Wallet not Connected")
+      const faucetContr = faucetContract(signer)
+      const txn = await faucetContr.transfer(MoonCoinAddr)
+      await txn.wait(1)
+      setTxnUrl(`https://testnet.ftmscan.com/tx/${txn.hash}`)
+      alert("Transfer Successful")
+    } catch (err) {
+      console.log(err)
+      alert("Got Error while transferring tokens")
     }
     setIsTransfering(false)
   }
@@ -62,36 +59,44 @@ export default function TokenBox({
   }
 
   return (
-    <div className="border-2 border-violet-500 p-4 rounded">
+    <div className="flex flex-col m-2 border-2 border-violet-500 p-4 rounded">
       <p>Name: {t.name}</p>
       <p>Symbol: {t.symbol}</p>
       <p>
-        Mint:{" "}
+        Token Address:{" "}
         <a
-          className={`text-violet-500`}
+          className="text-violet-500 break-all"
           target="_blank"
           rel="noreferrer"
           href={
             network === Network.SolanaDevnet
               ? `https://solscan.io/token/${t.address}?cluster=devnet`
-              : `https://testnet.ftmscan.com/token/${t.address}`
+              : `https://testnet.ftmscan.com/token/${MoonCoinAddr}`
           }
         >
-          {t.address}
+          {network === Network.SolanaDevnet ? t.address : MoonCoinAddr}
         </a>
       </p>
 
-      <Button1
-        disabled={isTransfering}
-        onClick={() => {
-          if (network === Network.SolanaDevnet) transferSolTokens()
-          else if (network === Network.FantomTestnet) transferEVMTokens()
-        }}
-      >
-        {isTransfering
-          ? "Transferring..."
-          : `Get ${t.transfer_amount} ${t.symbol}`}
-      </Button1>
+      <div className="flex flex-wrap items-center justify-around mt-4">
+        <div>
+          {Network.FantomTestnet ? <ConnectWallet colorMode="dark" /> : null}
+        </div>
+
+        <Button1
+          disabled={isTransfering}
+          onClick={() => {
+            if (network === Network.SolanaDevnet) transferSolTokens()
+            else if (network === Network.FantomTestnet) transferEVMTokens()
+          }}
+        >
+          {isTransfering
+            ? "Transferring..."
+            : network === Network.SolanaDevnet
+            ? `Get ${t.transfer_amount} ${t.symbol}`
+            : "Get 700 MN"}
+        </Button1>
+      </div>
     </div>
   )
 }

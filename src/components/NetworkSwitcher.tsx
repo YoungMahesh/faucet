@@ -24,7 +24,7 @@ export default function NetworkSwitcher() {
             checked={currNet === Network.FantomTestnet}
             onChange={() => switchNetwork(Network.FantomTestnet)}
           />
-          <span className="ml-2">EVM</span>
+          <span className="ml-2">Fantom Testnet</span>
         </label>
         <label className="inline-flex items-center">
           <input
@@ -35,7 +35,7 @@ export default function NetworkSwitcher() {
             checked={currNet === Network.SolanaDevnet}
             onChange={() => switchNetwork(Network.SolanaDevnet)}
           />
-          <span className="ml-2">Solana</span>
+          <span className="ml-2">Solana Devnet</span>
         </label>
       </div>
     </div>

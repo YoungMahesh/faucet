@@ -15,8 +15,6 @@ export default function TokensList({ network }: { network: Network }) {
 
   return (
     <div className="w-full">
-      <Heading1 />
-
       <div className="flex flex-col items-center justify-center p-2">
         {data.map((t, idx) => (
           <TokenBox key={idx} t={t} setTxnUrl={setTxnUrl} />
